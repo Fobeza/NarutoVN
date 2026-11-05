@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101a17">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Легенды Вереска — одиночное приключение</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game-shell" aria-label="Легенды Вереска">
+    <canvas id="world" aria-label="Игровой мир"></canvas>
+    <div class="shade"></div>
+    <header class="topbar">
+      <div class="identity"><div class="portrait"><span>⚔</span><i id="levelBadge">1</i></div><div class="identity-info"><div class="name-line"><strong>Странник</strong><span>ВОИН</span></div><div class="bar health"><div id="healthFill"></div><span id="healthText">100 / 100</span></div><div class="bar mana"><div id="manaFill"></div><span id="manaText">40 / 40</span></div></div></div>
+      <div class="location"><span class="location-icon">✦</span><div><small>ВЫ НАХОДИТЕСЬ В</small><strong id="locationName">Вересковая поляна</strong></div></div>
+      <button id="menuBtn" class="square-button menu-button" aria-label="Меню">☰</button>
+    </header>
+    <div class="world-heading"><span class="ornament">───── ✦ ─────</span><h1 id="worldTitle">Вересковая поляна</h1><p id="worldSubtitle">Тихие земли · Уровень 1–3</p></div>
+    <div id="questCard" class="quest-card"><div class="quest-mark">!</div><div><small>ТЕКУЩЕЕ ЗАДАНИЕ</small><strong id="questTitle">Незваные гости</strong><span id="questProgress">Победите слизней: 0 / 3</span></div><span class="quest-arrow">›</span></div>
+    <div id="targetHud" class="target-hud hidden" aria-live="polite"><div><strong id="targetName"></strong><span id="targetHealth"></span></div><div class="target-bar"><i id="targetFill"></i></div></div>
+    <div id="toast" class="toast" role="status"></div>
+    <div id="hint" class="hint"><span>✧</span> Коснитесь врага, чтобы атаковать <span>✧</span></div>
+    <div class="bottom-area">
+      <div class="controls"><div class="joystick-zone" id="joystick" aria-label="Джойстик перемещения"><div class="joystick-base"><span class="direction up">▲</span><span class="direction down">▼</span><span class="direction left">◀</span><span class="direction right">▶</span><div class="joystick-knob" id="knob"><span>✥</span></div></div></div>
+        <div class="actions"><button class="skill potion" id="potionBtn" aria-label="Использовать зелье"><span>♜</span><small id="potionCount">3</small></button><button class="skill guard" id="guardBtn" aria-label="Защитная стойка"><span>⛨</span><small id="guardTimer">3</small></button><button class="skill special" id="skillBtn" aria-label="Сильный удар"><span>✧</span><small id="skillTimer">2</small></button><button class="attack" id="attackBtn" aria-label="Начать или остановить автоатаку" aria-pressed="false"><span>⚔</span><small id="attackState"></small></button></div></div>
+      <div class="bottom-bar"><div class="xp-wrap"><span>ОПЫТ</span><div class="xp-bar"><i id="xpFill"></i></div><span id="xpText">0 / 50</span></div><div class="navigation"><button id="mapBtn"><span>⌖</span><small>КАРТА</small></button><button id="bagBtn"><span>▣</span><small>СУМКА</small></button><button id="questBtn"><span>☷</span><small>ЗАДАНИЯ</small></button><button id="characterBtn"><span>♟</span><small>ГЕРОЙ</small></button></div></div>
+    </div>
+    <div id="overlay" class="overlay hidden"><section class="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle"><div class="panel-top"><span>✦</span><h2 id="panelTitle"></h2><button id="closePanel" aria-label="Закрыть">×</button></div><div id="panelBody"></div></section></div>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
