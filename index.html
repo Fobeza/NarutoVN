@@ -13,12 +13,13 @@
     <canvas id="world" aria-label="Игровой мир"></canvas>
     <div class="shade"></div>
     <header class="topbar">
-      <div class="identity"><div class="portrait"><span>⚔</span><i id="levelBadge">1</i></div><div class="identity-info"><div class="name-line"><strong>Странник</strong><span>ВОИН</span></div><div class="bar health"><div id="healthFill"></div><span id="healthText">100 / 100</span></div><div class="bar mana"><div id="manaFill"></div><span id="manaText">40 / 40</span></div></div></div>
+      <div class="identity"><div class="portrait"><span>⚔</span><i id="levelBadge">1</i></div><div class="identity-info"><div class="name-line"><strong id="playerName">Странник</strong><span>ВОИН</span></div><div class="bar health"><div id="healthFill"></div><span id="healthText">100 / 100</span></div><div class="bar mana"><div id="manaFill"></div><span id="manaText">40 / 40</span></div></div></div>
       <div class="location"><span class="location-icon">✦</span><div><small>ВЫ НАХОДИТЕСЬ В</small><strong id="locationName">Вересковая поляна</strong></div></div>
       <button id="menuBtn" class="square-button menu-button" aria-label="Меню">☰</button>
     </header>
     <div class="world-heading"><span class="ornament">───── ✦ ─────</span><h1 id="worldTitle">Вересковая поляна</h1><p id="worldSubtitle">Тихие земли · Уровень 1–3</p></div>
     <div id="questCard" class="quest-card"><div class="quest-mark">!</div><div><small>ТЕКУЩЕЕ ЗАДАНИЕ</small><strong id="questTitle">Незваные гости</strong><span id="questProgress">Победите слизней: 0 / 3</span></div><span class="quest-arrow">›</span></div>
+    <button id="minimapButton" class="minimap-button" aria-label="Открыть карту"><canvas id="minimap" width="140" height="78"></canvas><span>КАРТА</span></button>
     <div id="targetHud" class="target-hud hidden" aria-live="polite"><div><strong id="targetName"></strong><span id="targetHealth"></span></div><div class="target-bar"><i id="targetFill"></i></div></div>
     <div id="toast" class="toast" role="status"></div>
     <div id="hint" class="hint"><span>✧</span> Коснитесь врага, чтобы атаковать <span>✧</span></div>
@@ -29,6 +30,26 @@
     </div>
     <div id="overlay" class="overlay hidden"><section class="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle"><div class="panel-top"><span>✦</span><h2 id="panelTitle"></h2><button id="closePanel" aria-label="Закрыть">×</button></div><div id="panelBody"></div></section></div>
   </main>
+  <section id="titleScreen" class="title-screen" aria-label="Начало игры">
+    <div class="title-stage">
+      <div class="title-vignette"></div>
+      <header class="title-brand"><span class="brand-overline">ОДИНОЧНОЕ ПРИКЛЮЧЕНИЕ</span><div class="brand-name">Легенды<span>Вереска</span></div><div class="brand-flourish">✦ &nbsp; ПУТЬ СТРАННИКА &nbsp; ✦</div></header>
+      <div class="title-view title-home" id="titleHome">
+        <div class="home-intro"><div class="home-badge">✦ &nbsp; ТИХИЕ ЗЕМЛИ &nbsp; ✦</div><h1>История начинается<br><em>с первого шага</em></h1><p>Исследуй мир, сражайся и найди свою легенду.</p></div>
+        <div class="home-controls"><p id="savedHero" class="saved-hero">ТВОЁ ПРИКЛЮЧЕНИЕ ЖДЁТ</p><button id="playButton" class="rpg-button primary">Играть <span>›</span></button><button id="titleMenuButton" class="rpg-button secondary">Меню</button></div>
+      </div>
+      <div class="title-view title-menu is-hidden" id="titleMenu"><div class="creation-panel compact"><div class="panel-caption"><span>✦</span> МЕНЮ <span>✦</span></div><h2>Твоё приключение</h2><p>Игра сохраняется только в этом браузере.</p><div class="menu-cards"><button id="continueButton" class="menu-card"><span>⚔</span>Продолжить</button><button id="newHeroButton" class="menu-card"><span>✦</span>Новый герой</button><button id="aboutButton" class="menu-card"><span>ⓘ</span>Об игре</button></div><p id="aboutText" class="about-text is-hidden">Одиночная игра в мире Вереска. Сеть и регистрация не требуются.</p></div><button id="menuBackButton" class="rpg-button secondary bottom-back">Назад</button></div>
+      <div class="title-view wizard-view is-hidden" id="wizardView"><div class="creation-panel">
+        <div class="wizard-topline"><span>СОЗДАНИЕ ГЕРОЯ</span><span id="stepIndicator">ШАГ 1 / 3</span></div>
+        <div id="factionStep" class="wizard-step"><div class="panel-caption"><span>✦</span> ВЫБОР СТОРОНЫ <span>✦</span></div><h2>С кем твой путь?</h2><p class="step-description">Выбери историю, с которой начнётся твоё путешествие.</p><div class="faction-grid"><button class="faction-choice chosen" data-faction="keepers" aria-pressed="true"><span class="faction-symbol">✦</span><strong>Хранители</strong><small>Свет древнего леса</small></button><button class="faction-choice" data-faction="shades" aria-pressed="false"><span class="faction-symbol">☾</span><strong>Сумеречные</strong><small>Тайны ночных троп</small></button></div><div class="faction-description"><span>✧</span><p id="factionDescription">Хранители оберегают покой лесных земель и помогают путникам.</p></div><p class="fine-print">Пока выбор влияет только на внешний вид. Класс — воин.</p></div>
+        <div id="appearanceStep" class="wizard-step is-hidden"><div class="panel-caption"><span>✦</span> ВНЕШНОСТЬ <span>✦</span></div><h2>Создай своего героя</h2><div class="character-preview"><canvas id="heroPreview" width="192" height="94" aria-label="Предпросмотр персонажа"></canvas><span>ВОИН · ВИД СПЕРЕДИ, СБОКУ И СО СПИНЫ</span></div><div class="option-heading">Облик</div><div class="choice-row"><button class="small-choice chosen" data-sex="male" aria-pressed="true">Облик I</button><button class="small-choice" data-sex="female" aria-pressed="false">Облик II</button></div><div class="option-heading">Причёска</div><div class="choice-row"><button class="small-choice chosen" data-hair="0" aria-pressed="true">I</button><button class="small-choice" data-hair="1" aria-pressed="false">II</button><button class="small-choice" data-hair="2" aria-pressed="false">III</button></div><div class="option-heading">Цвет волос</div><div class="choice-row hair-colors"><button class="color-choice chosen" data-color="brown" aria-label="Каштановый" aria-pressed="true"></button><button class="color-choice" data-color="gold" aria-label="Золотой" aria-pressed="false"></button><button class="color-choice" data-color="silver" aria-label="Серебряный" aria-pressed="false"></button><button class="color-choice" data-color="red" aria-label="Рыжий" aria-pressed="false"></button></div></div>
+        <div id="nameStep" class="wizard-step is-hidden"><div class="panel-caption"><span>✦</span> ИМЯ ГЕРОЯ <span>✦</span></div><h2>Как тебя зовут?</h2><p class="step-description">Это имя появится над твоим персонажем и в его профиле.</p><label class="name-label" for="heroNameInput">ИМЯ ПЕРСОНАЖА</label><input id="heroNameInput" class="name-input" type="text" maxlength="10" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Например, Fobeza"><p class="fine-print">От 3 до 10 латинских букв, без пробелов.</p><p id="nameError" class="name-error" role="alert"></p><div class="world-note"><span>✦</span><div><strong>Тихие земли</strong><small>Одиночный мир · локальное сохранение</small></div></div></div>
+        <div class="step-progress"><i id="progressOne" class="current"></i><i id="progressTwo"></i><i id="progressThree"></i></div>
+      </div><div class="wizard-actions"><button id="wizardBack" class="rpg-button secondary">Назад</button><button id="wizardNext" class="rpg-button primary">Далее <span>›</span></button></div></div>
+      <footer class="title-footer">ВЕРСИЯ ПРОТОТИПА <span>✦</span> ОДИНОЧНАЯ ИГРА</footer>
+    </div>
+  </section>
   <script src="game.js"></script>
+  <script src="onboarding.js"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, '..', 'game.js'), 'utf8');
 
 // Minimal browser stand-in; this verifies game logic, not actual browser rendering or touch support.
-function game(saved) {
+function game(saved, options={}) {
   const elements = {};
   const context2d = new Proxy({}, {
     get: (obj, key) => obj[key] || (obj[key] = () => {}),
@@ -34,12 +34,17 @@ function game(saved) {
     Image: class { constructor() { this.complete = false; this.naturalWidth = 0; } },
     document: { getElementById: element, addEventListener() {} },
     window: { addEventListener() {} },
-    localStorage: { getItem: () => stored, setItem: (_, value) => { stored = value; } },
+    localStorage: { getItem: () => stored, setItem: (_, value) => { if(options.storageBlocked)throw new Error('blocked'); stored = value; } },
     requestAnimationFrame: callback => { frame = callback; }, confirm: () => true,
   };
   vm.runInNewContext(source, environment);
+  if (options.autoStart!==false) {
+    if (saved) environment.window.HeatherGame.resume();
+    else environment.window.HeatherGame.create({name:'Hero',faction:'keepers',sex:'male',hairStyle:0,hairColor:'brown'});
+  }
   return {
     element,
+    api: environment.window.HeatherGame,
     step(count) { for (let i = 0; i < count; i++) { time += 50; frame(time); } },
     press(id) { element(id).pointerdown({ preventDefault() {} }); },
     tapCanvas(x, y) { element('world').pointerdown({ preventDefault() {}, clientX: x, clientY: y }); },
@@ -343,4 +348,50 @@ test('tapping ground or opening a menu cancels combat without an automatic resta
   h.step(30);
   assert.equal(h.element('attackBtn')['aria-pressed'],'false');
   assert.equal(h.element('targetHealth').textContent,'16 / 30');
+});
+
+test('title pause does not create or overwrite a save; existing saves resume', () => {
+  const fresh=game(null,{autoStart:false});
+  fresh.step(130);
+  assert.equal(fresh.saved(),null);
+  fresh.api.pause();
+  assert.equal(fresh.saved(),null);
+  const old=oldSave({gold:42,kills:2,zone:'camp'});
+  const existing=game(old,{autoStart:false});
+  existing.step(130);existing.api.pause();
+  assert.equal(existing.saved().gold,42);
+  assert.equal(existing.saved().kills,2);
+  assert.equal(existing.api.profile().name,'Странник');
+  assert.equal(existing.api.resume(),true);
+  existing.element('characterBtn').onclick();
+  assert.match(existing.element('panelBody').innerHTML,/Странник/);
+});
+
+test('character creation validates, persists and displays the chosen profile', () => {
+  const g=game(oldSave({gold:42}),{autoStart:false});
+  const profile={name:'Fobeza',faction:'shades',sex:'female',hairStyle:2,hairColor:'silver'};
+  assert.equal(g.api.create({...profile,name:'<img>'}).ok,false);
+  assert.equal(g.saved().gold,42);
+  assert.equal(g.api.create(profile).ok,true);
+  const save=g.saved();
+  assert.equal(save.name,'Fobeza');assert.equal(save.faction,'shades');assert.equal(save.sex,'female');
+  assert.equal(save.hairStyle,2);assert.equal(save.hairColor,'silver');assert.equal(save.gold,0);
+  assert.equal(g.element('playerName').textContent,'Fobeza');
+  const reloaded=game(save);
+  reloaded.element('characterBtn').onclick();
+  assert.match(reloaded.element('panelBody').innerHTML,/Fobeza/);
+  assert.equal(reloaded.api.profile().hairColor,'silver');
+});
+
+test('blocked storage reports failure without losing the in-memory character', () => {
+  const g=game(null,{autoStart:false,storageBlocked:true});
+  const result=g.api.create({name:'Hero',faction:'keepers',sex:'male',hairStyle:0,hairColor:'brown'});
+  assert.equal(result.ok,true);assert.equal(result.saved,false);
+  g.api.pause();assert.equal(g.api.hasSave(),true);assert.equal(g.api.resume(),true);
+  assert.equal(g.element('playerName').textContent,'Hero');
+});
+
+test('minimap opens the map panel', () => {
+  const g=game(oldSave());g.element('minimapButton').onclick();
+  assert.equal(g.element('panelTitle').textContent,'Карта местности');
 });
